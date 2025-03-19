@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Админ-панель{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .admin-nav {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .admin-nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .admin-nav a.active {
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .admin-content {
+            padding: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="admin-nav">
+        <a href="{{ path('admin_view') }}" class="{{ app.request.get('_route') == 'admin_view' ? 'active' : '' }}">Главная</a>
+        <a href="{{ path('admin_books') }}" class="{{ app.request.get('_route') == 'admin_books' ? 'active' : '' }}">Редактирование книг</a>
+        <a href="{{ path('admin_categories') }}" class="{{ app.request.get('_route') == 'admin_categories' ? 'active' : '' }}">Редактирование категорий</a>
+    </div>
+
+    <div class="admin-content">
+        {% block admin_content %}
+            <h1>Добро пожаловать в админ-панель</h1>
+            <p>Выберите раздел для редактирования.</p>
+        {% endblock %}
+    </div>
+{% endblock %}

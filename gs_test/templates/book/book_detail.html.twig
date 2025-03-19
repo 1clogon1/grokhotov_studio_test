@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Детали книги{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .book-image {
+            width: 200px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="book-detail">
+        <div id="book-info"></div>
+        <h3>Книги из текущей категории</h3>
+        <div id="related-books" class="row"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            const bookId = {{ id }};
+
+            $.ajax({
+                url: `http://127.0.0.1:80/api/book/${bookId}`,
+                method: 'GET',
+                success: function(response) {
+                    const book = response.data;
+                    const bookInfo = $('#book-info');
+
+                    const authors = book.authors.map(author => author.name).join(', ');
+                    const categories = book.categories.map(category => `${category.name}`).join(', ');
+
+                    const bookDetail = `
+                    <div class="card">
+                        <img src="${book.thumbnail_url}" class="book-image card-img-top" alt="${book.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${book.title}</h5>
+                            <p class="card-text">${book.long_description}</p>
+                            <p class="card-text">Количество страниц: ${book.page_count}</p>
+                            <p class="card-text">ISBN: ${book.isbn}</p>
+                            <p class="card-text">Авторы: ${authors}</p>
+                            <p class="card-text">Категории: ${categories}</p>
+                        </div>
+                    </div>
+                `;
+                    bookInfo.html(bookDetail);
+                }
+            });
+
+            $.ajax({
+                url: `http://127.0.0.1:80/api/book/${bookId}/related`,
+                method: 'GET',
+                success: function(response) {
+                    const relatedBooks = response.data;
+                    const relatedContainer = $('#related-books');
+
+                    relatedBooks.forEach(book => {
+                        const authors = book.authors.map(author => author.name).join(', ');
+
+                        const card = `
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <img src="${book.thumbnail_url}" class="book-image card-img-top" alt="${book.title}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${book.title}</h5>
+                                    <p class="card-text">Авторы: ${authors}</p>
+                                    <a href="/book/${book.id}" class="btn btn-primary">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                        relatedContainer.append(card);
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

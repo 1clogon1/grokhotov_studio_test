@@ -1,0 +1,47 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block admin_content %}
+    <h1>Редактирование категории</h1>
+    <form id="categoryForm" method="post">
+        <div class="form-group">
+            <label for="name">Название</label>
+            <input type="text" id="name" name="name" class="form-control" value="{{ category.name }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+
+    <script>
+        document.getElementById('categoryForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+            };
+
+            const url = '/api/admin/category'
+            const method = 'PUT';
+
+            formData.id = {{ category.id }};
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.href = '/admin/categories';
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+        });
+    </script>
+{% endblock %}

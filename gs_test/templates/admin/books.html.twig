@@ -1,0 +1,60 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block admin_content %}
+    <h1>Редактирование книг</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Авторы</th>
+            <th>Категории</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+            <tr>
+                <td>{{ book.id }}</td>
+                <td>{{ book.title }}</td>
+                <td>{{ book.authors|map(author => author.name)|join(', ') }}</td>
+                <td>{{ book.categories|map(category => category.name)|join(', ') }}</td>
+                <td>
+                    <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="btn btn-sm btn-primary">Редактировать</a>
+                    <button class="btn btn-sm btn-danger delete-book" data-id="{{ book.id }}">Удалить</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.querySelectorAll('.delete-book').forEach(button => {
+            button.addEventListener('click', function () {
+                const bookId = this.getAttribute('data-id');
+
+                if (confirm('Вы уверены, что хотите удалить эту книгу?')) {
+                    fetch(`/api/admin/book`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: bookId }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                alert(data.message);
+                                window.location.reload();
+                            } else if (data.error) {
+                                alert(data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Ошибка:', error);
+                        });
+                }
+            });
+        });
+    </script>
+{% endblock %}

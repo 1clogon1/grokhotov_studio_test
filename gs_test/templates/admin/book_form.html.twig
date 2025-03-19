@@ -1,0 +1,93 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block admin_content %}
+    <h1>{{ book.id ? 'Редактирование книги' : 'Создание книги' }}</h1>
+    <form id="bookForm" method="post" enctype="multipart/form-data">
+        {% if book.id %}
+            <input type="hidden" id="id" name="id" value="{{ book.id }}">
+        {% endif %}
+        <div class="form-group">
+            <label for="title">Название</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ book.title }}">
+        </div>
+        <div class="form-group">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" name="isbn" class="form-control" value="{{ book.isbn }}">
+        </div>
+        <div class="form-group">
+            <label for="pageCount">Количество страниц</label>
+            <input type="number" id="pageCount" name="pageCount" class="form-control" value="{{ book.pageCount }}">
+        </div>
+        <div class="form-group">
+            <label for="publishedDate">Дата публикации</label>
+            <input type="date" id="publishedDate" name="publishedDate" class="form-control" value="{{ book.publishedDate ? book.publishedDate|date('Y-m-d') : '' }}">
+        </div>
+        <div class="form-group">
+            <label for="shortDescription">Краткое описание</label>
+            <textarea id="shortDescription" name="shortDescription" class="form-control">{{ book.shortDescription }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="longDescription">Полное описание</label>
+            <textarea id="longDescription" name="longDescription" class="form-control">{{ book.longDescription }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="status">Статус</label>
+            <select id="status" name="status" class="form-control">
+                <option value="published" {{ book.status == 'published' ? 'selected' : '' }}>Опубликовано</option>
+                <option value="draft" {{ book.status == 'draft' ? 'selected' : '' }}>Черновик</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="authors">Авторы</label>
+            <input type="text" id="authors" name="authors" class="form-control" value="{{ book.authors|map(author => author.name)|join(', ') }}">
+        </div>
+        <div class="form-group">
+            <label for="categories">Категории</label>
+            <input type="text" id="categories" name="categories" class="form-control" value="{{ book.categories|map(category => category.name)|join(', ') }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+
+    <script>
+        document.getElementById('bookForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = {
+                id: document.getElementById('id').value,
+                title: document.getElementById('title').value,
+                isbn: document.getElementById('isbn').value,
+                pageCount: document.getElementById('pageCount').value,
+                publishedDate: document.getElementById('publishedDate').value,
+                shortDescription: document.getElementById('shortDescription').value,
+                longDescription: document.getElementById('longDescription').value,
+                status: document.getElementById('status').value,
+                authors: document.getElementById('authors').value,
+                categories: document.getElementById('categories').value,
+            };
+
+            const url = '/api/admin/book';
+            const method = 'PUT';
+
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        window.location.href = '/admin/books';
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+        });
+    </script>
+{% endblock %}

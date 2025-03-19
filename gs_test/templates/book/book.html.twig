@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Список книг{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .book-image {
+            width: 200px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Список книг</h1>
+        <div class="mb-4">
+            <label for="categoryFilter">Фильтр по категории:</label>
+            <select id="categoryFilter" class="form-control">
+                <option value="">Все категории</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="books-container" class="row"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            const categoryFilter = $('#categoryFilter');
+
+            function loadBooks(categoryId = '') {
+                const url = categoryId ? `/api/book?category=${categoryId}` : '/api/book';
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(response) {
+                        const books = response.data;
+                        const container = $('#books-container');
+                        container.empty();
+
+                        books.forEach(book => {
+                            const card = `
+                                <div class="col-md-3 mb-4">
+                                    <div class="card">
+                                        <img src="${book.thumbnail_url}" class="book-image card-img-top" alt="${book.title}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${book.title}</h5>
+                                            <a href="/book/${book.id}" class="btn btn-primary">Подробнее</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            container.append(card);
+                        });
+                    }
+                });
+            }
+
+            loadBooks();
+
+            categoryFilter.on('change', function() {
+                const selectedCategoryId = $(this).val();
+                loadBooks(selectedCategoryId);
+            });
+        });
+    </script>
+{% endblock %}

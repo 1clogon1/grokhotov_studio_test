@@ -1,0 +1,26 @@
+parameters:
+    book_count: 20
+    email: t.t.maxi05092003@gmail.com
+    book_import_url: 'https://gitlab.grokhotov.ru/hr/yii-test-vacancy/-/raw/master/books.json'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Command\ImportBooksCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $bookImportUrl: '%book_import_url%'
+
+    App\Command\CreateAdminCommand:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $passwordHasher: '@security.user_password_hasher'
