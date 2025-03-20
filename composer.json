@@ -1,5 +1,0 @@
-{
-    "require": {
-        "symfony/webapp-pack": "^1.3"
-    }
-}
