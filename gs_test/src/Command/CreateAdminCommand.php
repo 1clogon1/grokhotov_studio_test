@@ -29,7 +29,7 @@ class CreateAdminCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Create an admin user');
+            ->setDescription('Создаем пользователя админ');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,7 +46,7 @@ class CreateAdminCommand extends Command
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $output->writeln('Admin user created successfully.');
+        $output->writeln('Пользователь админ успешно создан');
 
         return Command::SUCCESS;
     }
